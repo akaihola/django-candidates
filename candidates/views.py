@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.db import transaction
 from django.utils.cache import add_never_cache_headers
 
 from classyviews import ClassyView
@@ -35,6 +36,11 @@ class EditApplicationBase(ApplicationViewBase):
     def GET(self, request, username=''):
         return self.handle_request(request,
                                    None, None, username)
+
+    @transaction.commit_on_success
+    def POST(self, request, username=''):
+        return self.handle_request(request,
+                                   request.POST, request.FILES, username)
 
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
