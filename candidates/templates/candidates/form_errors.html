@@ -1,0 +1,9 @@
+{% load i18n %}
+{% for error in form.non_field_errors %}
+  <tr><th>{% trans "Error" %}:</th><td class="error">{{ error }}</td></tr>
+{% endfor %}
+{% for field in form %}
+  {% if field.errors %}
+    <tr><th>{{ field.label }}:</th><td>{{ field.errors }}</td></tr>
+  {% endif %}
+{% endfor %}
