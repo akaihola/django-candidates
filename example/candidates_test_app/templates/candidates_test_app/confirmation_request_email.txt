@@ -1,0 +1,13 @@
+You have submitted an application. Please confirm the application
+either by
+
+* visiting http://localhost:8000/confirm/{{ application.pk }}-{{ application.confirmation_code }}/
+
+or
+
+* entering your password: {{ password }}
+  on the page: http://localhost:8000/login/{{ application.user.username }}/
+
+You can modify your existing application after you have logged in.
+
+Important: you must confirm the application before {{ deadline }}
