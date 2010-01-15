@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from random import seed, choice
 from datetime import date, datetime
 
 from django.db import transaction
@@ -269,6 +270,23 @@ class EditApplicationBase(ApplicationViewBase):
         saving the user and application forms.
         """
         pass
+
+    @staticmethod
+    def assign_password(username):
+        common = '23456789abcdefghijkmnpqrstuvwxyz'
+        rare = 'ABCDEFGHJKLMNPQRSTUVWXYZ'
+        alphabet = 3 * common + rare
+        seed()
+        password = ''.join(choice(alphabet) for x in range(8))
+        logging.debug(
+            '********** setting password for %r to %r' % (username, password))
+        user = User.objects.get(username=username)
+        user.set_password(password)
+        pk = user.pk
+        user.save()
+        logging.debug('Saved user %r as %r' % (pk, user.pk))
+        logging.debug('---------> %r' % user.password)
+        return User.objects.get(pk=user.pk), password
 
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
