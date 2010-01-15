@@ -18,4 +18,4 @@ class UserExistsTestCase(TestCase):
         ok_(user_exists('candy@cool.net', 'Candidate', 'Candy', '2010'))
 
     def test_email_mismatch(self):
-        ok_(user_exists('candy2@cool.net', 'Candidate', 'Candy', '2010'))
+        eq_(user_exists('candy2@cool.net', 'Candidate', 'Candy', '2010'), False)
