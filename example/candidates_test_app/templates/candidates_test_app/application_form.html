@@ -4,16 +4,16 @@
   <p>The deadline has passed.</p>
 {% else %}
   {% if not view_only %}
-    <p>Deadline is {{ deadline }}.</p>
+    <p>The deadline for applications is {{ deadline }}.</p>
     {% if saved %}
       {% if should_confirm %}
         <p>
-          Application has been submitted.
-          An e-mail has been sent to you.
-          Confirm e-mail before {{ deadline }}.
+          Your application has been submitted.
+          An e-mail requesting confirmation has been sent to you.
+          Please confirm the application before {{ deadline }}.
         </p>
       {% else %}
-        <p>Application has been confirmed.</p>
+        <p>Your application has been confirmed.</p>
       {% endif %}{# should_confirm #}
     {% endif %}{# saved #}
     {% if has_errors %}
