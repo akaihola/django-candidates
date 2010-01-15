@@ -6,9 +6,11 @@ from datetime import date, datetime
 
 from django.db import transaction
 from django.conf import settings
+from django.core.mail import send_mail
 from django.utils.cache import add_never_cache_headers
 from django.contrib.auth import login, logout, authenticate
 from django.forms.formsets import all_valid
+from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
@@ -48,6 +50,19 @@ class ApplicationViewBase(ClassyView):
         add_never_cache_headers(self)
 
 class EditApplicationBase(ApplicationViewBase):
+    """Base class for the edit application view
+
+    Subclasses must define the following attributes:
+
+    * :attr:`confirmation_request_template_name`: the template used
+      for the confirmation request e-mail
+
+    * :attr:`confirmation_request_subject`: the subject of the
+      confirmation request e-mail
+
+    * :attr:`meta`: the class for additional meta information (see
+      :class:`MetaBase`)
+    """
     template_name = 'candidates/application_form.html'
 
     def GET(self, request, username=''):
@@ -287,6 +302,21 @@ class EditApplicationBase(ApplicationViewBase):
         logging.debug('Saved user %r as %r' % (pk, user.pk))
         logging.debug('---------> %r' % user.password)
         return User.objects.get(pk=user.pk), password
+
+    @classmethod
+    def send_confirmation_email(cls, application, password):
+        body = render_to_string(
+            cls.confirmation_request_template_name,
+            {'application': application,
+             'password': password,
+             'deadline': cls.meta.get_deadline()})
+        send_mail(cls.confirmation_request_subject,
+                  body,
+                  settings.APPLICATION_EMAIL_SENDER,
+                  [application.user.email],
+                  fail_silently=False)
+        application.send_confirmation_email = False
+        return application.save()
 
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
