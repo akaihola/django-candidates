@@ -19,6 +19,9 @@ class ApplicationMeta(MetaBase):
 class EditApplication(EditApplicationBase):
     meta = ApplicationMeta
     template_name = 'candidates_test_app/application_form.html'
+    confirmation_request_template_name = (
+        'candidates_test_app/confirmation_request_email.txt')
+    confirmation_request_subject = 'Please confirm your application'
 
     @classmethod
     def create_application_form(cls, data, instance, prefix):
