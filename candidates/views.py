@@ -216,6 +216,25 @@ class EditApplicationBase(ApplicationViewBase):
     def create_extra_forms(cls, data, files, user, appl):
         return []
 
+    @classmethod
+    def save(cls, user, application_form, *extra_forms, **kwargs):
+        "Save the user, application and extra forms"
+        user = cls.save_user(user)
+        application = cls.save_application(
+            application_form, user, kwargs.pop('is_secretary'))
+        cls.save_extra_forms(user, application, *extra_forms)
+        return user.username, application
+
+    @classmethod
+    def save_extra_forms(cls, user, application):
+        """Save extra forms besides the user and application forms
+
+        Override this method to save extra forms belonging to the
+        application.  The :meth:`save` method calls this method after
+        saving the user and application forms.
+        """
+        pass
+
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
 
