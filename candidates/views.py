@@ -248,6 +248,19 @@ class EditApplicationBase(ApplicationViewBase):
         return user
 
     @classmethod
+    def save_application(cls, application_form, user, is_secretary):
+        application = application_form.save(commit=False)
+        application.user = user
+        application.round_name = cls.meta.current_round_name()
+        if is_secretary:
+            application.confirmed = True
+            application.send_confirmation_email = False
+        pk = application.pk
+        application.save()
+        logging.debug('Saved application %r as %r' % (pk, application.pk))
+        return cls.meta.model.objects.get(pk=application.pk)
+
+    @classmethod
     def save_extra_forms(cls, user, application):
         """Save extra forms besides the user and application forms
 
