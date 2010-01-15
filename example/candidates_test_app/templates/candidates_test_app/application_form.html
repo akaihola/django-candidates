@@ -1,0 +1,47 @@
+{% load candidates_tags %}
+
+{% if past_deadline and not view_only %}
+  <p>The deadline has passed.</p>
+{% else %}
+  {% if not view_only %}
+    <p>Deadline is {{ deadline }}.</p>
+    {% if saved %}
+      {% if should_confirm %}
+        <p>
+          Application has been submitted.
+          An e-mail has been sent to you.
+          Confirm e-mail before {{ deadline }}.
+        </p>
+      {% else %}
+        <p>Application has been confirmed.</p>
+      {% endif %}{# should_confirm #}
+    {% endif %}{# saved #}
+    {% if has_errors %}
+      <p>
+        There are errors in the form.
+        {% if saved %}
+          Changes have not been saved.
+        {% else %}
+          The application has not been submitted.
+        {% endif %}{# saved #}
+      </p>
+      {% with application_form as form %}
+        {% include "candidates_test_app/form_errors.html" %}
+      {% endwith %}
+      {% with user_form as form %}
+        {% include "candidates_test_app/form_errors.html" %}
+      {% endwith %}
+    {% endif %}{# has_errors #}
+  {% endif %}{# not view_only #}
+  <form method="post" action=".">
+    {% application_form_field user_form.last_name %}
+    {% application_form_field user_form.first_name %}
+    {% application_form_field user_form.email %}
+    {% application_form_field application_form.cv %}
+    {% application_form_field application_form.experience_years %}
+    <input type="submit" name="send"
+	   value="{% if saved %}Update{% else %}Submit{% endif %} Application" />
+    <input type="submit" name="clear"
+	   value="Clear Form" />
+  </form>
+{% endif %}{# past_deadline and not view_only #}

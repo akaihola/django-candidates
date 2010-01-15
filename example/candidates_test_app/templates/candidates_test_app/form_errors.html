@@ -1,0 +1,8 @@
+{% for error in form.non_field_errors %}
+  <p>Error: {{ error }}</p>
+{% endfor %}
+{% for field in form %}
+  {% if field.errors %}
+    <p>{{ field.label }}: {{ field.errors }}</p>
+  {% endif %}
+{% endfor %}
