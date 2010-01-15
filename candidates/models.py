@@ -10,16 +10,31 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
 class ApplicationBase(models.Model):
-    user = models.ForeignKey(User, related_name='applications')
+    user = models.ForeignKey(
+        User,
+        related_name='applications',
+        editable=False)
     round_name = models.CharField(
         _('season'),
         max_length=20,
+        editable=False,
         help_text=_('Year of first possible month of stay'))
     send_confirmation_email = models.BooleanField(
-        _('Send confirmation e-mail'), default=True)
-    confirmed = models.BooleanField(_('Confirmed'), default=False)
-    date_created = models.DateTimeField(_('When created'), auto_now_add=True)
-    date_updated = models.DateTimeField(_('Last update'), auto_now=True)
+        _('Send confirmation e-mail'),
+        default=True,
+        editable=False)
+    confirmed = models.BooleanField(
+        _('Confirmed'),
+        default=False,
+        editable=False)
+    date_created = models.DateTimeField(
+        _('When created'),
+        auto_now_add=True,
+        editable=False)
+    date_updated = models.DateTimeField(
+        _('Last update'),
+        auto_now=True,
+        editable=False)
 
     def _get_confirmation_code(self):
         """
