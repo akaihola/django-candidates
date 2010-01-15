@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from datetime import date
+import logging
+from datetime import date, datetime
 
 from django.db import transaction
 from django.conf import settings
@@ -13,6 +14,7 @@ from django.contrib.auth.models import User
 from classyviews import ClassyView
 
 from candidates.forms import UserForm
+from candidates.utils.users import generate_username
 
 class MetaBase:
     @classmethod
@@ -218,12 +220,32 @@ class EditApplicationBase(ApplicationViewBase):
 
     @classmethod
     def save(cls, user, application_form, *extra_forms, **kwargs):
-        "Save the user, application and extra forms"
         user = cls.save_user(user)
         application = cls.save_application(
             application_form, user, kwargs.pop('is_secretary'))
         cls.save_extra_forms(user, application, *extra_forms)
         return user.username, application
+
+    @classmethod
+    def save_user(cls, user):
+        if not user.pk:
+            # This is a new application, user will be saved for the first time.
+            user.date_joined = datetime.now()
+            user.is_active = True
+            user.username = generate_username(
+                user.first_name, user.last_name,
+                cls.meta.current_round_name())
+            n = 2
+            while User.objects.filter(username=user.username):
+                user.username = generate_username(
+                    user.first_name, user.last_name,
+                    cls.meta.current_round_name(), n)
+                n += 1
+        user.last_login = datetime.now()
+        pk = user.pk
+        user.save()
+        logging.debug('Saved user %r as %r' % (pk, user.pk))
+        return user
 
     @classmethod
     def save_extra_forms(cls, user, application):
