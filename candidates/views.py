@@ -64,6 +64,9 @@ class EditApplicationBase(ApplicationViewBase):
       :class:`MetaBase`)
     """
     template_name = 'candidates/application_form.html'
+    confirmation_request_template_name = (
+        'candidates/confirmation_request_email.txt')
+    confirmation_request_subject = 'Please confirm your application'
 
     def GET(self, request, username=''):
         return self.handle_request(request,
