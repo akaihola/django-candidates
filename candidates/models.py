@@ -15,10 +15,10 @@ class ApplicationBase(models.Model):
         related_name='applications',
         editable=False)
     round_name = models.CharField(
-        _('season'),
+        _('round'),
         max_length=20,
         editable=False,
-        help_text=_('Year of first possible month of stay'))
+        help_text=_('Indicate the round of applications, e.g. year'))
     send_confirmation_email = models.BooleanField(
         _('Send confirmation e-mail'),
         default=True,
