@@ -274,7 +274,8 @@ class EditApplicationBase(ApplicationViewBase):
         return user
 
     @classmethod
-    def save_application(cls, application_form, user, is_secretary):
+    def save_application(cls,
+                         application_form, user, is_secretary, commit=True):
         application = application_form.save(commit=False)
         application.user = user
         application.round_name = cls.meta.current_round_name()
@@ -282,9 +283,12 @@ class EditApplicationBase(ApplicationViewBase):
             application.confirmed = True
             application.send_confirmation_email = False
         pk = application.pk
-        application.save()
-        logging.debug('Saved application %r as %r' % (pk, application.pk))
-        return cls.meta.model.objects.get(pk=application.pk)
+        if commit:
+            application.save()
+            logging.debug('Saved application %r as %r' % (pk, application.pk))
+            return cls.meta.model.objects.get(pk=application.pk)
+        else:
+            return application
 
     @classmethod
     def save_extra_forms(cls, user, application):
