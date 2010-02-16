@@ -199,6 +199,7 @@ class EditApplicationBase(ApplicationViewBase):
     def create_forms(cls, data, files, user, appl):
         """
         ``user``: an existing user (not secretary) or None
+        ``appl``: an application instance, saved or new
 
         Inherited classes can extend this list of forms.  The first
         two items must always be the user form and the application
@@ -235,6 +236,12 @@ class EditApplicationBase(ApplicationViewBase):
 
     @classmethod
     def create_extra_forms(cls, data, files, user, appl):
+        """Create any extra forms for the application
+
+        Subclasses may override this class method to create extra
+        forms related to the application, e.g. attachments or other
+        repeated forms.
+        """
         return []
 
     @classmethod
