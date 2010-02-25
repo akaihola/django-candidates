@@ -16,6 +16,6 @@ INSTALLED_APPS = ('django.contrib.auth',
                   'django_nose',
                   'candidates',
                   'candidates_test_app',)
-TEST_RUNNER = 'django_nose.run_tests'
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 APPLICATION_EMAIL_SENDER = 'robot@localhost'
