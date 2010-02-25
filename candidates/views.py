@@ -68,10 +68,12 @@ class EditApplicationBase(ApplicationViewBase):
         'candidates/confirmation_request_email.txt')
     confirmation_request_subject = 'Please confirm your application'
 
+    @classmethod
     def GET(self, request, username=''):
         return self.handle_request(request,
                                    None, None, username)
 
+    @classmethod
     @transaction.commit_on_success
     def POST(self, request, username=''):
         return self.handle_request(request,
