@@ -13,6 +13,7 @@ from django.forms.formsets import all_valid
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
+from django.utils.datastructures import SortedDict
 
 from classyviews import ClassyView
 
@@ -157,12 +158,26 @@ class EditApplicationBase(ApplicationViewBase):
                 app.user = user
 
         forms = cls.create_forms(data, files, user, app)
-        all_forms_valid = all_valid(forms)
+
+        def all_valid_recursive(form_seq):
+            """Validate forms in a nested list structure"""
+            valid = True
+            for item in form_seq:
+                if callable(getattr(item, 'is_valid', None)):
+                    if not item.is_valid():
+                        valid = False
+                elif not all_valid_recursive(item):
+                    valid = False
+            return valid
+
+        all_forms_valid = all_valid_recursive(forms.values())
         if all_forms_valid:
             # The application is valid and should be saved.
-            user = forms[0].save(commit=False)
+            user = forms['user_form'].save(commit=False)
+            other_forms = dict((k, v) for k, v in forms.items()
+                               if k != 'user_form')
             username, application = cls.save(
-                user, *forms[1:], **{'is_secretary': secretary})
+                user, is_secretary=secretary, **other_forms)
             saved = True
             if application.send_confirmation_email:
                 user, password = cls.assign_password(username)
@@ -189,13 +204,12 @@ class EditApplicationBase(ApplicationViewBase):
             should_confirm = \
                 not app.send_confirmation_email and not app.confirmed
         return dict(
-            forms=forms,
-            user_form=forms[0],
-            application_form=forms[1],
+            forms=forms.values(),
             saved=saved,
             has_errors=data is not None and not all_forms_valid,
             should_confirm=should_confirm,
-            deadline=cls.meta.get_deadline())
+            deadline=cls.meta.get_deadline(),
+            **forms)
 
     @classmethod
     def create_forms(cls, data, files, user, appl):
@@ -212,12 +226,12 @@ class EditApplicationBase(ApplicationViewBase):
         forms.extend(...)
         return forms
         """
-        forms = [
-            cls.create_user_form(
-                data, instance=user, prefix='user'),
-            cls.create_application_form(
-                data, instance=appl, prefix='application')]
-        forms.extend(cls.create_extra_forms(data, files, user, appl))
+        forms = SortedDict()
+        forms['user_form'] = cls.create_user_form(
+            data, instance=user, prefix='user')
+        forms['application_form'] = cls.create_application_form(
+            data, instance=appl, prefix='application')
+        forms.update(cls.create_extra_forms(data, files, user, appl))
         return forms
 
     @classmethod
@@ -244,14 +258,16 @@ class EditApplicationBase(ApplicationViewBase):
         forms related to the application, e.g. attachments or other
         repeated forms.
         """
-        return []
+        return SortedDict()
 
     @classmethod
-    def save(cls, user, application_form, *extra_forms, **kwargs):
+    def save(cls, user, is_secretary=None, **forms):
         user = cls.save_user(user)
         application = cls.save_application(
-            application_form, user, kwargs.pop('is_secretary'))
-        cls.save_extra_forms(user, application, *extra_forms)
+            forms['application_form'], user, is_secretary)
+        other_forms = dict((k, v) for k, v in forms.items()
+                           if k != 'application_form')
+        cls.save_extra_forms(user, application, **other_forms)
         return user.username, application
 
     @classmethod
