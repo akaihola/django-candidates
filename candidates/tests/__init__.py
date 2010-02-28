@@ -6,21 +6,25 @@ from candidates.tests.models import TestModel
 
 saved_settings = {}
 
-def setUp():
-    saved_settings['INSTALLED_APPS'] = settings.INSTALLED_APPS
-    settings.INSTALLED_APPS = 'candidates.tests',
 
-def tearDown():
-    settings.INSTALLED_APPS = saved_settings['INSTALLED_APPS']
+class OverrideSettingsTestCase(TestCase):
+    def setUp(self):
+        saved_settings['INSTALLED_APPS'] = settings.INSTALLED_APPS
+        settings.INSTALLED_APPS = 'candidates.tests',
 
-class MetaBaseTests(TestCase):
+    def tearDown(self):
+        settings.INSTALLED_APPS = saved_settings['INSTALLED_APPS']
+
+
+class MetaBaseTests(OverrideSettingsTestCase):
     def test_01_abstract_meta(self):
         self.assertRaises(NotImplementedError,
                           MetaBase.get_deadline)
         self.assertRaises(NotImplementedError,
                           MetaBase.get_view_permission)
 
-class MetaSubclassTests(TestCase):
+
+class MetaSubclassTests(OverrideSettingsTestCase):
     def test_01_default_view_permission(self):
         class meta(MetaBase):
             model = TestModel
@@ -43,7 +47,8 @@ class MetaSubclassTests(TestCase):
         self.assertEqual(meta.get_view_permission(),
                          'view_mymodel')
 
-class EditApplicationBaseTests(TestCase):
+
+class EditApplicationBaseTests(OverrideSettingsTestCase):
     def test_01_abstract_meta(self):
         self.assertRaises(NotImplementedError,
                           EditApplicationBase.meta.get_deadline)
