@@ -9,7 +9,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.cache import add_never_cache_headers
 from django.contrib.auth import login, logout, authenticate
-from django.forms.formsets import all_valid
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -19,6 +18,7 @@ from classyviews import ClassyView
 
 from candidates.forms import UserForm
 from candidates.utils.users import generate_username
+
 
 class MetaBase:
     @classmethod
@@ -34,14 +34,19 @@ class MetaBase:
 
     @classmethod
     def get_view_permission(cls):
-        try: return cls.view_permission
-        except AttributeError: pass
-        try: return 'view_%s' % cls.model._meta.module_name
-        except AttributeError: pass
+        try:
+            return cls.view_permission
+        except AttributeError:
+            pass
+        try:
+            return 'view_%s' % cls.model._meta.module_name
+        except AttributeError:
+            pass
         raise NotImplementedError(
             'Define either the model attribute, the get_view_permission class '
             'method or the view_permission string attribute in the overridden '
             'meta class of views inherited from django-candidates')
+
 
 class ApplicationViewBase(ClassyView):
     meta = MetaBase
@@ -49,6 +54,7 @@ class ApplicationViewBase(ClassyView):
     def __init__(self, *args, **kwargs):
         super(ApplicationViewBase, self).__init__(*args, **kwargs)
         add_never_cache_headers(self)
+
 
 class EditApplicationBase(ApplicationViewBase):
     """Base class for the edit application view
@@ -70,15 +76,15 @@ class EditApplicationBase(ApplicationViewBase):
     confirmation_request_subject = 'Please confirm your application'
 
     @classmethod
-    def GET(self, request, username=''):
-        return self.handle_request(request,
-                                   None, None, username)
+    def GET(cls, request, username=''):
+        return cls.handle_request(request,
+                                  None, None, username)
 
     @classmethod
     @transaction.commit_on_success
-    def POST(self, request, username=''):
-        return self.handle_request(request,
-                                   request.POST, request.FILES, username)
+    def POST(cls, request, username=''):
+        return cls.handle_request(request,
+                                  request.POST, request.FILES, username)
 
     @classmethod
     def handle_request(cls, request, data, files, username):
@@ -288,7 +294,7 @@ class EditApplicationBase(ApplicationViewBase):
         user.last_login = datetime.now()
         pk = user.pk
         user.save()
-        logging.debug('Saved user %r as %r' % (pk, user.pk))
+        logging.debug('Saved user %r as %r', pk, user.pk)
         return user
 
     @classmethod
@@ -303,7 +309,7 @@ class EditApplicationBase(ApplicationViewBase):
         pk = application.pk
         if commit:
             application.save()
-            logging.debug('Saved application %r as %r' % (pk, application.pk))
+            logging.debug('Saved application %r as %r', pk, application.pk)
             return cls.meta.model.objects.get(pk=application.pk)
         else:
             return application
@@ -326,13 +332,13 @@ class EditApplicationBase(ApplicationViewBase):
         seed()
         password = ''.join(choice(alphabet) for x in range(8))
         logging.debug(
-            '********** setting password for %r to %r' % (username, password))
+            '********** setting password for %r to %r', username, password)
         user = User.objects.get(username=username)
         user.set_password(password)
         pk = user.pk
         user.save()
-        logging.debug('Saved user %r as %r' % (pk, user.pk))
-        logging.debug('---------> %r' % user.password)
+        logging.debug('Saved user %r as %r', pk, user.pk)
+        logging.debug('---------> %r', user.password)
         return User.objects.get(pk=user.pk), password
 
     @classmethod
@@ -350,12 +356,14 @@ class EditApplicationBase(ApplicationViewBase):
         application.send_confirmation_email = False
         return application.save()
 
+
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
 
     def __init__(self, *args, **kwargs):
         super(ConfirmApplicationBase, self).__init__(*args, **kwargs)
         add_never_cache_headers(self)
+
 
 class ApplicationListBase(ApplicationViewBase):
     template_name = 'candidates/application_list.html'

@@ -6,6 +6,7 @@ from candidates_test_app.models import Application
 
 from candidates.forms import user_exists
 
+
 class UserExistsTestCase(TestCase):
 
     def setUp(self):
@@ -18,4 +19,5 @@ class UserExistsTestCase(TestCase):
         ok_(user_exists('candy@cool.net', 'Candidate', 'Candy', '2010'))
 
     def test_email_mismatch(self):
-        eq_(user_exists('candy2@cool.net', 'Candidate', 'Candy', '2010'), False)
+        eq_(user_exists('candy2@cool.net', 'Candidate', 'Candy', '2010'),
+            False)
