@@ -67,7 +67,7 @@ class UserForm(BaseUserForm):
         identical name and e-mail address hasn't already been
         registered on this round.
         """
-        c = self.cleaned_data
+        c = super(UserForm, self).clean()
         if (self.instance.pk is None and
             c.get('email') and
             user_exists(c.get('email'),
