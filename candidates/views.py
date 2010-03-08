@@ -74,6 +74,7 @@ class EditApplicationBase(ApplicationViewBase):
     confirmation_request_template_name = (
         'candidates/confirmation_request_email.txt')
     confirmation_request_subject = 'Please confirm your application'
+    edit_application_view_name = 'edit-application'
 
     @classmethod
     def GET(cls, request, username=''):
@@ -197,7 +198,8 @@ class EditApplicationBase(ApplicationViewBase):
                 # redirect since the public interface is embedded on a CMS
                 # page.
                 return {'link_to_private': reverse(
-                        'edit-application', kwargs={'username': username})}
+                    cls.edit_application_view_name,
+                    kwargs={'username': username})}
             else:
                 # A visitor saved a valid application. Log in as the user of
                 # the application.
