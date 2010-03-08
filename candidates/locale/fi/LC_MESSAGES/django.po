@@ -1,0 +1,72 @@
+# Finnish translations for the django-candidates re-usable app.
+# Copyright (C) 2009-2010 Ambitone Oy
+# This file is distributed under the same license as the django-candidates package.
+# Antti Kaihola <akaihol+django@ambitone.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-candidates 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-08 18:38+0200\n"
+"PO-Revision-Date: 2010-03-08 18:41+0200\n"
+"Last-Translator: Antti Kaihola <akaihol+django@ambitone.com>\n"
+"Language-Team: Finnish <akaihol+django@ambitone.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: forms.py:46
+msgid "last name"
+msgstr "sukunimi"
+
+#: forms.py:47
+msgid "first name"
+msgstr "etunimi"
+
+#: forms.py:48
+msgid "e-mail address"
+msgstr "sähköpostiosoite"
+
+#: forms.py:78
+msgid "APPLICATION_EXISTS PLEASE_LOGIN"
+msgstr ""
+"Olet jo lähettänyt hakemuksen.\n"
+"Sinulle lähetetyssä sähköpostiviestissä on linkki sisäänkirjautumissivulle "
+"sekä salasana.\n"
+"Niiden avulla pääset täydentämään hakemustasi."
+
+#: models.py:18
+msgid "round"
+msgstr "hakukierros"
+
+#: models.py:21
+msgid "Indicate the round of applications, e.g. year"
+msgstr "Syötä hakukierroksen tunniste, esim. vuosiluku"
+
+#: models.py:23
+msgid "Send confirmation e-mail"
+msgstr "Lähetä vahvistuspyyntö sähköpostilla"
+
+#: models.py:27
+msgid "Confirmed"
+msgstr "Vahvistettu"
+
+#: models.py:31
+msgid "When created"
+msgstr "Luomisaika"
+
+#: models.py:35
+msgid "Last update"
+msgstr "Päivitysaika"
+
+#: models.py:58
+msgid "application"
+msgstr "hakemus"
+
+#: models.py:59
+msgid "applications"
+msgstr "hakemukset"
+
+#: templates/candidates/form_errors.html:3
+msgid "Error"
+msgstr "Virhe"

@@ -1,0 +1,72 @@
+# English translations for the django-candidates re-usable app.
+# Copyright (C) 2009-2010 Ambitone Oy
+# This file is distributed under the same license as the django-candidates package.
+# Antti Kaihola <akaihol+django@ambitone.com>, 2009-2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: django-candidates 0.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-03-08 18:42+0200\n"
+"PO-Revision-Date: 2010-03-08 18:42+0200\n"
+"Last-Translator: Antti Kaihola <akaihol+django@ambitone.com>\n"
+"Language-Team: English <akaihol+django@ambitone.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: forms.py:46
+msgid "last name"
+msgstr ""
+
+#: forms.py:47
+msgid "first name"
+msgstr ""
+
+#: forms.py:48
+msgid "e-mail address"
+msgstr ""
+
+#: forms.py:78
+msgid "APPLICATION_EXISTS PLEASE_LOGIN"
+msgstr ""
+"You have already submitted an application.\n"
+"You have received an e-mail message with a link to the login page and a "
+"password.\n"
+"Please use them to edit your application."
+
+#: models.py:18
+msgid "round"
+msgstr ""
+
+#: models.py:21
+msgid "Indicate the round of applications, e.g. year"
+msgstr ""
+
+#: models.py:23
+msgid "Send confirmation e-mail"
+msgstr ""
+
+#: models.py:27
+msgid "Confirmed"
+msgstr ""
+
+#: models.py:31
+msgid "When created"
+msgstr ""
+
+#: models.py:35
+msgid "Last update"
+msgstr ""
+
+#: models.py:58
+msgid "application"
+msgstr ""
+
+#: models.py:59
+msgid "applications"
+msgstr ""
+
+#: templates/candidates/form_errors.html:3
+msgid "Error"
+msgstr ""
