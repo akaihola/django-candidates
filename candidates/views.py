@@ -465,5 +465,5 @@ class ApplicationConfirmationResultBase(ClassyView):
             context['form'] = AuthenticationForm(
                 request, initial={'username': username})
         else:
-            self.template_name = 'applications/invalid_confirmation_code.html'
+            self.template_name = 'candidates/invalid_confirmation_code.html'
         return context
