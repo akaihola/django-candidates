@@ -5,12 +5,15 @@ from random import seed, choice
 from datetime import date, datetime
 
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
 from django.utils.cache import add_never_cache_headers
 from django.contrib.auth import login, logout, authenticate
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.utils.datastructures import SortedDict
 
@@ -368,6 +371,15 @@ class ConfirmApplicationBase(ApplicationViewBase):
         super(ConfirmApplicationBase, self).__init__(*args, **kwargs)
         add_never_cache_headers(self)
 
+    def GET(self, request, application_id, confirmation_code):
+        application = get_object_or_404(self.meta.model, pk=application_id)
+        if confirmation_code == application.confirmation_code:
+            application.confirmed = True
+            application.save()
+        return HttpResponseRedirect(
+            reverse('application-confirmation-result',
+                    kwargs={'application_id': application.pk}))
+
 
 class ApplicationListBase(ApplicationViewBase):
     template_name = 'candidates/application_list.html'
@@ -375,3 +387,83 @@ class ApplicationListBase(ApplicationViewBase):
     def __init__(self, *args, **kwargs):
         super(ApplicationListBase, self).__init__(*args, **kwargs)
         add_never_cache_headers(self)
+
+
+class LoginBase(ClassyView):
+    template_name = 'candidates/login.html'
+
+    def GET(self, request, username=''):
+        form = AuthenticationForm(request, initial={'username': username})
+        return self.display_form(request, form, username)
+
+    def POST(self, request, username=None):
+        # ``username=None`` here temporarily because people might have the old
+        # login form in cache.  The old version POSTed to the
+        # ``login-applicant`` view which includes the username in the URL.
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            return self.login(request, form.get_user())
+        return self.display_form(request, form, request.POST['username'])
+
+    @classmethod
+    def login(cls, request, user):
+        """
+        Log in a user whose password has been checked.  Redirect to the
+        application list, if the user has permission (secretary, board members
+        and the superuser).  If an applicant has an unconfirmed application,
+        confirm it show a confirmation page.  If an applicant already has a
+        confirmed application, just show the filled in form.
+        """
+        login(request, user)
+        if request.session.test_cookie_worked():
+            request.session.delete_test_cookie()
+
+        if user.has_perm('%s.%s' % (
+                        cls.meta.model._meta.app_label,
+                        cls.meta.get_view_permission())):
+            # secretary and board members go to the application list
+            return HttpResponseRedirect(reverse(
+                    'application-list', kwargs={
+                        'round': cls.meta.current_round_name()}))
+
+        # confirm application and show it
+        redirect_to = cls.meta.edit_application_view_name
+        try:
+            app = user.applications.get(
+                round_name=cls.meta.current_round_name())
+            if not app.confirmed:
+                app.confirmed = True
+                app.save()
+                redirect_to = reverse(
+                    'application-confirmation-result',
+                    kwargs={'application_id': app.pk})
+        except cls.meta.model.DoesNotExist:
+            # no application is found, show an empty application form
+            pass
+        return HttpResponseRedirect(redirect_to)
+
+    @classmethod
+    def display_form(cls, request, form, username):
+        request.session.set_test_cookie()
+        return {'form': form,
+                'username': username,
+                'login_url': reverse(cls.meta.login_view_name)}
+
+
+class ApplicationConfirmationResultBase(ClassyView):
+    confirmed_template_name = 'candidates/confirmed.html'
+    invalid_code_template_name = 'candidates/invalid_confirmation_code.html'
+
+    def GET(self, request, application_id):
+        application = get_object_or_404(self.meta.model, pk=application_id)
+        username = application.user.username
+        context = dict(
+            deadline=self.meta.get_deadline(),
+            username=username)
+        if application.confirmed:
+            self.template_name = self.confirmed_template_name
+            context['form'] = AuthenticationForm(
+                request, initial={'username': username})
+        else:
+            self.template_name = 'applications/invalid_confirmation_code.html'
+        return context
