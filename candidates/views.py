@@ -24,8 +24,10 @@ from candidates.utils.users import generate_username
 
 
 class MetaBase:
+    application_form_view_name = 'application-form'
     edit_application_view_name = 'edit-application'
     login_view_name = 'login'
+    prefilled_login_view_name = 'applicant-login'
 
     @classmethod
     def current_round_name(cls):
@@ -363,6 +365,12 @@ class EditApplicationBase(ApplicationViewBase):
         application.send_confirmation_email = False
         return application.save()
 
+    @classmethod
+    def redirect_to_login(cls, username):
+        url = reverse(cls.meta.prefilled_login_view_name,
+                      kwargs={'username': username})
+        return HttpResponseRedirect(url)
+
 
 class ConfirmApplicationBase(ApplicationViewBase):
     template_name = 'candidates/confirm_application.html'
@@ -426,8 +434,9 @@ class LoginBase(ClassyView):
                     'application-list', kwargs={
                         'round': cls.meta.current_round_name()}))
 
-        # confirm application and show it
-        redirect_to = cls.meta.edit_application_view_name
+        # Confirm application and show it.  Username not in URL,
+        # logged in.
+        redirect_to = reverse(cls.meta.application_form_view_name)
         try:
             app = user.applications.get(
                 round_name=cls.meta.current_round_name())
