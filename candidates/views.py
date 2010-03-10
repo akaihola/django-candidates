@@ -195,7 +195,7 @@ class EditApplicationBase(ApplicationViewBase):
             saved = True
             if application.send_confirmation_email:
                 user, password = cls.assign_password(username)
-                cls.send_confirmation_email(application, password)
+                cls.send_confirmation_email(request, application, password)
                 user = authenticate(username=username, password=password)
             else:
                 user.backend = settings.AUTHENTICATION_BACKENDS[0]
@@ -351,12 +351,14 @@ class EditApplicationBase(ApplicationViewBase):
         return User.objects.get(pk=user.pk), password
 
     @classmethod
-    def send_confirmation_email(cls, application, password):
+    def send_confirmation_email(cls, request, application, password):
         body = render_to_string(
             cls.confirmation_request_template_name,
             {'application': application,
              'password': password,
-             'deadline': cls.meta.get_deadline()})
+             'deadline': cls.meta.get_deadline(),
+             'request': request,
+             'settings': settings})
         send_mail(cls.confirmation_request_subject,
                   body,
                   settings.APPLICATION_EMAIL_SENDER,
