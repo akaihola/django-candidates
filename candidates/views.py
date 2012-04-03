@@ -165,6 +165,7 @@ class EditApplicationBase(ApplicationViewBase):
                 saved = True
             except cls.meta.model.DoesNotExist:
                 logout(request)
+                user = None
 
         if app is None:
             app = cls.meta.model()
