@@ -8,6 +8,7 @@ setup(
     author_email = 'akaihol+django@ambitone.com',
     description = ('Application form handling re-usable app for Django'),
     url = 'http://github.com/akaihola/django-candidates/tree/master',
+    install_requires = ["pytz"],
     download_url = ('http://www.github.com/akaihola/django-candidates/'
                     'tarball/0.1'),
     classifiers=(

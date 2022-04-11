@@ -2,7 +2,7 @@
 
 import logging
 from random import seed, choice
-from datetime import date, datetime
+from datetime import datetime
 
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -21,6 +21,8 @@ from classyviews import ClassyView
 
 from candidates.forms import UserForm
 from candidates.utils.users import generate_username
+
+from pytz import timezone
 
 
 class MetaBase:
@@ -106,6 +108,9 @@ class EditApplicationBase(ApplicationViewBase):
           template
         * a :class:`HttpResponseRedirect` object
 
+        For the deadline, check against the US/Hawaii timezone since that's probably the
+        westernmost timezone with applicants.
+
         Public interface
         ================
 
@@ -138,7 +143,8 @@ class EditApplicationBase(ApplicationViewBase):
         if not secretary:
             if not public_interface:
                 return cls.redirect_to_login('')
-            elif date.today() > cls.meta.get_deadline():
+            today = datetime.now(tz=timezone('US/Hawaii')).date()
+            if today > cls.meta.get_deadline():
                 return {'past_deadline': True}
 
         user = None

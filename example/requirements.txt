@@ -1,3 +1,4 @@
 django
 django-nose
 git+git://github.com/akaihola/django-classyviews.git#classyviews
+pytz
