@@ -84,6 +84,7 @@ class EditApplicationBase(ApplicationViewBase):
     confirmation_request_template_name = (
         'candidates/confirmation_request_email.txt')
     confirmation_request_subject = 'Please confirm your application'
+    timezone = "US/Hawaii"
 
     @classmethod
     def GET(cls, request, username=''):
@@ -108,8 +109,9 @@ class EditApplicationBase(ApplicationViewBase):
           template
         * a :class:`HttpResponseRedirect` object
 
-        For the deadline, check against the US/Hawaii timezone since that's probably the
-        westernmost timezone with applicants.
+        For the deadline, check against the US/Hawaii timezone by default since that's
+        probably the westernmost timezone with applicants. This can be changed by
+        overriding the `EditApplicationBase.timezone` class attribute in a child class.
 
         Public interface
         ================
@@ -143,7 +145,7 @@ class EditApplicationBase(ApplicationViewBase):
         if not secretary:
             if not public_interface:
                 return cls.redirect_to_login('')
-            today = datetime.now(tz=timezone('US/Hawaii')).date()
+            today = datetime.now(tz=timezone(cls.timezone)).date()
             if today > cls.meta.get_deadline():
                 return {'past_deadline': True}
 
